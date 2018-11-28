@@ -1,0 +1,131 @@
+---
+title: "chap03. Correlation by using batting indices"
+author: "Peter"
+date: '2018-11-13'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+## Pre-Processing
+
+### Make the basic set merged together into a table
+
+```{r}
+library(Lahman)
+library(plyr)
+a = subset(Batting, yearID>2014)
+a$teamID = as.numeric(as.factor(a$teamID))
+head(a)
+```
+
+```{r}
+b = function(a){return(data.frame(
+                team=ifelse(mean(a$teamID) == a$teamID, 0, 1),
+                a$playerID, a$lgID, a$SF, a$SH, a$H,
+                a$yearID, a$teamID, a$RBI, a$AB))}
+d = ddply(a,.(playerID), b)
+head(d)
+```
+
+
+## Get lag_ variables for previouse years data
+
+
+```{r}
+d$lag_team = as.numeric(sapply(1:nrow(d), function(x){d$a.teamID[x-1]}))
+head(d)
+```
+
+```{r}
+d$lag_RBI = as.numeric(sapply(1:nrow(d), function(x){d$a.RBI[x-1]}))
+d$lag_AB = as.numeric(sapply(1:nrow(d), function(x){d$a.AB[x-1]}))
+d$lag_SF = as.numeric(sapply(1:nrow(d), function(x){d$a.SF[x-1]}))
+d$lag_SH = as.numeric(sapply(1:nrow(d), function(x){d$a.SH[x-1]}))
+d$lag_H = as.numeric(sapply(1:nrow(d), function(x){d$a.H[x-1]}))
+d$lag_playerID = as.character(sapply(1:nrow(d), function(x){d$playerID[x-1]}))
+head(d)
+```
+
+### Filtering the data
+
+```{r}
+d$lag_team = ifelse(d$playerID==d$lag_playerID, d$lag_team, 'NA')
+head(d)
+```
+
+
+```{r}
+d$lag_avg = d$lag_H / d$lag_AB
+d$sac = d$lag_SF + d$lag_SH
+d = subset(d, d$a.AB > 400 & d$lag_AB > 400)
+d$change_rbi = d$a.RBI / d$lag_RBI
+d = subset(d, !(d$lag_team == 'NA' | d$a.teamID == d$lag_team))
+head(d)
+```
+
+add some additional variables for plotting
+
+```{r}
+d$lg_col = ifelse(d$a.lgID =='NL', 'gray', 'black')
+d$lg_shape = ifelse(d$a.lgID == 'NL', 2, 15)
+```
+
+
+
+### Calculate the Corvariance between 
+```{r}
+cor(d$lag_avg, d$change_rbi)
+```
+
+
+### Plot
+```{r}
+plot(d$lag_avg, d$change_rbi, main='Predictor of RBI', xlab=
+       'Batting Average of Prior year', ylab='Change in RBI', las = 1,
+       cex.axis = 0.8, pch=19, col=d$lg_col)
+text(x=0.3, y=1.6, label='r=-0.49')
+abline(lm(d$change_rbi~d$lag_avg, d))
+legend(x=0.29, y=1.4, c('National', 'American'), col=c('gray', 'black'), pch=c(19, 19))
+```
+
+## sac vs change_rbi
+
+```{r}
+cor(d$sac, d$change_rbi)
+```
+
+## plot
+
+```{r}
+plot(d$sac, d$change_rbi, main='Predictor of RBI', xlab=
+       'Sacrifice Flies & Hits', ylab='Change in RBI', las = 1,
+       cex.axis = 0.8, pch=d$lg_shape, col=d$lg_col)
+text(x=4, y=1.6, label='r=0.50')
+abline(lm(d$change_rbi~d$sac, d), lty=2, lwd=3)
+```
+
+
+## Get Correlation Table by Using tableHTML
+
+```{r}
+#install.packages('tableHTML')
+library(tableHTML)
+e = with(d, data.frame(change_rbi, sac, lag_avg))
+colnames(e) = c('c_RBI', 'Sacrifice', 'AVG')
+cor(e)
+```
+
+
+```{r}
+tableHTML(round(cor(e), 3))
+```
+
+
+
+
+
+
+
+

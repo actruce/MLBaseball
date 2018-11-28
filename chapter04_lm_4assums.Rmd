@@ -1,0 +1,83 @@
+---
+title: "chapter04_lm_4assums"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+1. linearity
+
+```{r}
+par(mfrow=c(1,2))
+x = c(1,2,4,8,16)
+y = c(1,2,3,4,5)
+plot(x, y, type='b', lwd=3, main='Before Transformation')
+x_adj = log(x)
+plot(x_adj, y, type='b', lwd=3, main='After Transformation')
+```
+
+2. homogeneity
+
+```{r}
+library(Lahman)
+rec = subset(Teams, yearID == 2014)
+rec$wp = rec$W / rec$G
+a = lm(wp~R, rec)
+library(lmtest)
+bptest(a)
+```
+
+It implies strong heteroscedasticity
+=> Do Box Cox Transformation!
+=> We can get a little improvement
+
+```{r }
+library(caret)
+b = BoxCoxTrans(rec$wp)
+c = cbind(rec, wp_adj=predict(b, rec$wp))
+d = lm(wp_adj~R, c)
+bptest(d)
+```
+
+
+3. independence
+  1) Errors of dependent variables not correlated with errors of independent variables.
+  2) Errors of dependent variables are independent each other dependent variables.
+
+
+4. normality
+
+ERA and avg models for estimating winning rate
+
+
+```{r}
+library(Lahman)
+rec = subset(Teams, yearID == 2014)
+rec$wp = rec$W/rec$G
+rec$avg = rec$H / rec$AB
+avg_model = lm(wp~avg, rec)
+ERA_model = lm(wp~ERA, rec)
+```
+
+
+### About Residual Standard Error
+
+If we use small residual standard error, we can narrow confidence and prediction interval so that we can improve the decisions.
+Otherwise, it's not helpful for decision making.
+
+avg_model
+
+```{r}
+summary(avg_model)
+```
+
+ERA model :
+
+```{r}
+summary(ERA_model)
+```
+
+
+
+

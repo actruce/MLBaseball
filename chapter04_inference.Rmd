@@ -1,0 +1,64 @@
+---
+title: "chapter04_inference"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+Let's examine the effect of one percent increase in batting avg. onto the winning ratio.
+
+```{r}
+library(Lahman)
+a = subset(Teams, yearID>2000)
+attach(a)
+a$avg = H/AB
+a$wp = W/G
+lm(wp~avg, a)
+```
+
+pwr.f2.test gives a minimum samples for linear regression
+
+```{r}
+library(pwr)
+pwr.f2.test(1, NULL, 0.01, 0.05, 0.95)
+```
+
+Do linear regression
+
+```{r}
+a = subset(Teams, lgID == 'AL' | lgID=='NL')
+b = sample(1:nrow(a), 1302)
+c = a[b,]
+c$avg = c$H / c$AB
+c$wp = c$W/c$G
+d = lm(wp~avg, data=c)
+summary(d)
+```
+
+Inspection of the effectivess of new variable
+If it is useless and no impact to explain our model, we can not reject the Hypothesis.
+
+H0 : existing model = new model
+existing model => Winning ratio = beta_0 + error
+new model => winning ratio = beta_0 + beta_1*batting_avg + error
+
+```{r}
+summary.aov(d)
+```
+
+so, we can reject the H0 and we can inspect new model is more effective than existing one.
+
+
+
+confidence interval and predicted interval
+```{r}
+e = data.frame(avg = 0.270)
+predict(d, e, level=0.95, interval = 'confidence')
+```
+
+```{r}
+e = data.frame(avg = 0.270)
+predict(d, e, level=0.95, interval = 'predict')
+```
+

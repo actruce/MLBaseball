@@ -1,0 +1,85 @@
+---
+title: "Chapter04.likelihood_probability"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+### 1. probability with OBP
+
+Joey Vottos OBP = 0.46
+10,000 simulated results with OBP = 0.46
+
+```{r}
+a = rbinom(10000, 5, 0.46)
+table(a) / 10000
+```
+
+
+1,000 simulated result with OBP = 0.46
+```{r}
+a = rbinom(1000, 5, 0.46)
+table(a) / 1000
+```
+
+### 2. maximum likelihood estimation
+
+"maximum likelihood estimation" at 2times on-base against 5times on bat
+
+1. Derivatives
+```{r}
+curve(log(10*x^2*(1-x)^3), 0, 1, ylab='Log Probability', xlab='OBP')
+```
+
+2. 6 cases of an OBP
+- 5 trials and 0, 1, 2, 3, 4, 5 base on cases
+
+
+```{r}
+OBP = 0.4
+base = 0:5
+P = OBP^base*(1-OBP)^(5-base)
+case = choose(5, base)
+EV = P*case
+EV
+```
+
+```{r}
+barplot(EV)
+```
+
+3. Different bar plots based on OBPs 0.2, 0.3, 0.4, 0.5
+
+```{r}
+par(mfrow=c(2,2))
+
+OBP = 0.2
+base = 0:5
+P = OBP^base*(1-OBP)^(5-base)
+case = choose(5, base)
+EV = P*case
+barplot(EV, main='OBP=0.2 (20.48%)', ylab='possibility')
+
+OBP = 0.3
+base = 0:5
+P = OBP^base*(1-OBP)^(5-base)
+case = choose(5, base)
+EV = P*case
+barplot(EV, main='OBP=0.3 (30.87%)', ylab='possibility')
+
+OBP = 0.4
+base = 0:5
+P = OBP^base*(1-OBP)^(5-base)
+case = choose(5, base)
+EV = P*case
+barplot(EV, main='OBP=0.4 (34.56%)', ylab='possibility')
+
+OBP = 0.5
+base = 0:5
+P = OBP^base*(1-OBP)^(5-base)
+case = choose(5, base)
+EV = P*case
+barplot(EV, main='OBP=0.5 (31.25%)', ylab='possibility')
+```
+
+

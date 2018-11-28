@@ -1,9 +1,11 @@
 ---
 title: "Chap02. Bind_Merge_Condition"
 author: "Peter"
-date: "2018-11-28"
-output: 
-  pdf_document : default
+date: '2018-11-28'
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
 ---
 
 ## cbind test

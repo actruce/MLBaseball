@@ -1,0 +1,41 @@
+---
+title: "Chap04. Central Limit Theorem"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+node 4 and 5 are most central nodes.
+
+```{r warning=FALSE}
+library(sand)
+library(igraph)
+g = graph.formula(1-5, 1-7, 2-9, 2-4, 3-5, 4-5, 4-6, 4-7)
+V(g)
+E(g)
+plot(g)
+```
+
+If there are many samples
+
+```{r}
+library(Lahman)
+a = subset(Batting, yearID > 2011 & yearID < 2016 & AB >=300)
+hist(a$H, main='949 players', breaks=seq(from=0, to=300, by=30))
+```
+
+If there are not many samples
+
+```{r}
+a = subset(Batting, yearID>2011&yearID<2016&AB>=300&teamID=='NYA')
+hist(a$H, main='32 players', breaks=seq(from=0, to=300, by=30))
+```
+
+student-t is used when the number of samples is less than 30 and populations' variance is unknown.
+
+```{r}
+curve(dnorm(x), -4, 4, ylab='density')
+curve(dt(x, df=3), add=TRUE, lty=2)
+```
+
