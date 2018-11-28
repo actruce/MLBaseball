@@ -1,0 +1,27 @@
+---
+title: "chap01. Correlation between Hit and Run scored"
+output:
+  pdf_document : default
+---
+## Purpose
+Using team data for the season 2016, 
+I tested the correlation between _HIT_ and _Run Scored_.
+
+
+### Result
+```{r echo=FALSE, warning=FALSE}
+library(Lahman)
+dat<-subset(Teams, yearID==2016, select=c(R, H))
+cor(dat$R, dat$H)
+```
+
+## Findings
+
+I found a positive relationship between the two variables.
+
+### _Scatterplot_
+*I plotted the relationship.
+
+```{r echo=FALSE}
+plot(dat$H, dat$R)
+```
