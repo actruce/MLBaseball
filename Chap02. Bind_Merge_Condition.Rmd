@@ -1,0 +1,108 @@
+---
+title: "Chap02. Bind_Merge_Condition"
+author: "Peter"
+date: "2018-11-28"
+output: 
+  pdf_document : default
+---
+
+## cbind test
+
+```{r}
+a = c('A', 'B', 'C', 'D', 'E')
+b = c(0.280, 0.257, 0.312, 0.266, 0.295)
+c = cbind(a, b)
+c
+```
+
+```{r}
+colnames(c) = c('player', 'avg')
+c
+```
+
+```{r}
+age = c(26, 23, 31, 27, 24)
+d = cbind(c, age)
+d
+```
+
+## rbind test
+```{r}
+f = rbind(a, b)
+f
+```
+
+## merge test
+
+```{r}
+d = matrix(c('C', 'D', 'E', 'B', 'A', 26, 23, 31, 27, 24), ncol=2)
+d
+```
+
+### Change name of variables
+
+```{r}
+colnames(d) = c('player', 'age')
+d
+```
+
+## Do Merge
+
+```{r}
+e = merge(c, d, by='player')
+e
+```
+
+
+## Convert discrete variables into Categorical variables
+
+```{r}
+str(e) # check table structures
+```
+
+```{r}
+e$age = as.numeric(e$age)
+e
+```
+
+What's Wrong?
+
+```{r}
+e$age = c(26, 23, 31, 27, 24) # compensate previous wrong
+e$age = as.character(e$age)
+g = ifelse(e$age>25, 1, 0)
+g
+```
+
+```{r}
+#e$age = c(26, 23, 31, 27, 24)
+h = cbind(e, g)
+h
+```
+
+
+## Conditional Expressions
+
+```{r}
+library(Lahman)
+aa = subset(Batting, playerID=='altuvjo01' | playerID=='zobribe01')
+aa
+```
+
+```{r}
+bb = subset(aa, yearID > 2011 & yearID < 2017)
+bb
+```
+
+```{r}
+cc = subset(bb, !(yearID == 2014 | yearID == 2015))
+cc
+```
+
+
+```{r}
+dd = subset(cc, select=c('playerID','HR','X3B'))
+dd
+```
+
+
