@@ -1,0 +1,60 @@
+---
+title: "chapter05_package_plyr"
+output:
+  pdf_document:
+    latex_engine : xelatex
+  html_document:
+    df_print: paged
+---
+
+## Observation of 0.300 Batting Avg. for 40 years
+
+경쟁 수준을 대변하는 타율의 표준편차가 적었던 시즌에 기록한 3할은 타율의 표준편차가
+컸던 시즌에 비해 같은 3할이라 하더라도 상대적으로 선수의 실력이 더 높다고 볼 수 있다.
+
+실제 타율 3할이 시즌별로 얼마나 가치가 다른지 확인하기 위해, 라만 데이터의 Batting
+테이블을 사용해 1977년부터 2016년까지 지난 40시즌 동안 시즌별 400타석을 초과한 타자들을
+대상으로 시즌별 3할에 대한 표준점수를 구한다.
+
+### 1. Make 'env' variable
+
+```{r}
+library(Lahman)
+library(plyr)
+a= subset(Batting, yearID>1975&yearID<2017, select=c('yearID', 'AB', 'H', 'G'))
+a$avg = a$H/a$AB
+a =na.omit(a)
+func= function(a){ return(data.frame(
+    sd=sd(a$avg[a$AB>400]), mean=mean(a$avg[a$AB>400])
+))}
+env = ddply(a, .(yearID), func)
+```
+
+### 2. scoring and percentile
+
+```{r}
+env$z = (0.3 - env$mean)/env$sd
+env$per = pnorm(0.3, env$mean, env$sd, lower.tail = TRUE)
+```
+
+```{r}
+head(env, 10)
+```
+
+
+### 3. Draw timeline graphs
+
+```{r}
+par(mfrow=c(1,2))
+plot(env$yearID, env$z, xlab='year', ylab='z score of 0.3 AVG')
+lines(smooth.spline(env$yearID, env$z))
+plot(env$yearID, env$per, xlab='year', ylab='Percentile of 0.3 AVG')
+lines(smooth.spline(env$yearID, env$per))
+```
+
+
+
+
+
+
+

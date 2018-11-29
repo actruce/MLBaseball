@@ -1,12 +1,12 @@
 ---
 title: "chapter04_inference"
 output:
-  pdf_document: default
-  html_document:
-    df_print: paged
+  pdf_document :
+    latex_engine : xelatex
+  html_document : default
+mainfont : NanumGothic
 ---
 
-Let's examine the effect of one percent increase in batting avg. onto the winning ratio.
 
 ```{r}
 library(Lahman)
@@ -36,6 +36,7 @@ d = lm(wp~avg, data=c)
 summary(d)
 ```
 
+F-statistics can be derived that between grouup deviation divided by within-group deviation
 Inspection of the effectivess of new variable
 If it is useless and no impact to explain our model, we can not reject the Hypothesis.
 
